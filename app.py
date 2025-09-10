@@ -1,0 +1,64 @@
+from fastapi import FastAPI
+import joblib
+import numpy as np
+from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+
+
+#Chargement du modèle au démarrage de l'application
+model = joblib.load("modele_sentiment.joblib")
+
+
+
+#Créez un endpoint /predict qui prend en entrée un objet JSON contenant 
+#les différentes caractéristiques de la maison (par exemple, {'surface': 150, 
+#'bedrooms': 3, 'bathrooms': 2}). Utilisez un Pydantic BaseModel pour 
+#valider les données d'entrée.
+# ◦ Dans la fonction de cet endpoint, utilisez le modèle pour faire une prédiction 
+#de prix.
+# ◦ Renvoie le prix prédit au format JSON
+
+class Sentiment(BaseModel):
+    review: str
+
+
+
+#Initialisation de l'application FastAPI
+
+
+app = FastAPI()
+
+origins = [
+    "http://localhost:5500",
+    # Ajoutez d'autres origines autorisées si nécessaire
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.post("/predict")
+def predict_sentiment(input: Sentiment):
+    #Conversion des données d'entrée liste pr sklearn
+    data = [input.review]
+
+    #Prédiction
+    prediction = model.predict(data)[0]
+    #return {"predicted_sentiment": int(prediction)}
+
+
+#Le modèle prédit une classe (0,1), on peut la mapper
+    #au nom du sentiment pour une meilleure lisibilité
+
+    sentiments = {0: "négatif", 1: "positif"}
+    predicted_sentiment = sentiments[int(prediction)]
+
+    return {"predicted_sentiment": predicted_sentiment}
+
+    
+#Lancez l'application FastAPI avec Uvicorn
+#uvicorn app:app --reload
