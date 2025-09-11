@@ -5,35 +5,12 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
 
-
-
-
-
-
-
-
-
-
-
 #Chargement du modèle au démarrage de l'application
 model = joblib.load("modele_sentiment.joblib")
 
 
-
-#Créez un endpoint /predict qui prend en entrée un objet JSON contenant 
-#les différentes caractéristiques de la maison (par exemple, {'surface': 150, 
-#'bedrooms': 3, 'bathrooms': 2}). Utilisez un Pydantic BaseModel pour 
-#valider les données d'entrée.
-# ◦ Dans la fonction de cet endpoint, utilisez le modèle pour faire une prédiction 
-#de prix.
-# ◦ Renvoie le prix prédit au format JSON
-
 class Sentiment(BaseModel):
     review: str
-
-
-
-#Initialisation de l'application FastAPI
 
 
 app = FastAPI()
@@ -57,7 +34,7 @@ app.add_middleware(
 
 @app.post("/predict")
 def predict_sentiment(review: Sentiment):
-    prediction = model.predict([review.text])
+    prediction = model.predict([review.review])
     sentiment_mapping = {0: "negative", 1: "positive"}
     predicted_sentiment = sentiment_mapping[prediction[0]]
     return {"prediction": predicted_sentiment}
