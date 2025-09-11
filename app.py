@@ -5,6 +5,16 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
 
+
+
+
+
+
+
+
+
+
+
 #Chargement du modèle au démarrage de l'application
 model = joblib.load("modele_sentiment.joblib")
 
@@ -44,6 +54,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def predict_sentiment(review: Sentiment):
+    prediction = model.predict([review.text])
+    sentiment_mapping = {0: "negative", 1: "positive"}
+    predicted_sentiment = sentiment_mapping[prediction[0]]
+    return {"prediction": predicted_sentiment}
+
+
+"""
+#première essai:
 @app.post("/predict")
 def predict_sentiment(input: Sentiment):
     #Conversion des données d'entrée liste pr sklearn
@@ -61,7 +80,29 @@ def predict_sentiment(input: Sentiment):
     predicted_sentiment = sentiments[int(prediction)]
 
     return {"predicted_sentiment": predicted_sentiment}
+"""
 
     
 #Lancez l'application FastAPI avec Uvicorn
 #uvicorn app:app --reload
+
+
+
+"""from fastapi import FastAPI
+from pydantic import BaseModel
+import joblib
+
+model = joblib.load("pipeline_sentiment.joblib")
+
+class ReviewData(BaseModel):
+    text: str
+
+app = FastAPI()
+
+@app.post("/predict")
+def predict_sentiment(review: ReviewData):
+    prediction = model.predict([review.text])
+    sentiment_mapping = {0: "negative", 1: "positive"}
+    predicted_sentiment = sentiment_mapping[prediction[0]]
+    return {"prediction": predicted_sentiment}
+    """
