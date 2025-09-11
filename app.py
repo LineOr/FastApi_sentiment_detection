@@ -30,6 +30,9 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5500",
+    "http://127.0.0.1:5500/Front-end_TP_sentiment/index.html",
+    "https://frontend-sentiment-detection.onrender.com"
+
     # Ajoutez d'autres origines autorisées si nécessaire
 ]
 
