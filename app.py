@@ -54,11 +54,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.post("/predict")
 def predict_sentiment(review: Sentiment):
     prediction = model.predict([review.text])
     sentiment_mapping = {0: "negative", 1: "positive"}
     predicted_sentiment = sentiment_mapping[prediction[0]]
     return {"prediction": predicted_sentiment}
+
+
 
 
 """
